@@ -8,6 +8,11 @@ A pomodoro timer is a tool used for the [Pomodoro Technique by Francesco Cirillo
 It is a time management method that uses a timer to break down work into intervals, traditionally 25 minutes in length, separated by short
 breaks. These intervals are named pomodoros, after the tomato-shaped kitchen timer that Cirillo used as a university student.
 
+## Screenshots
+
+![alt tag](https://i.imgur.com/Qn2Lc8K.jpg)
+App can be seen on the top right corner of the screen below the menu bar.
+
 ## Author
 
 * Samuel Yanez ~ [samyanez94](https://github.com/samyanez94)
