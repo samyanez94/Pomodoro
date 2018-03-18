@@ -1,7 +1,8 @@
 package com.example.pomodoro.controllers;
 
-import com.example.pomodoro.model.Attemp;
+import com.example.pomodoro.model.Attempt;
 import com.example.pomodoro.model.AttemptKind;
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.SimpleStringProperty;
@@ -9,20 +10,26 @@ import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.AudioClip;
 import javafx.util.Duration;
 
 public class Home {
     @FXML private VBox container;
     @FXML private Label title;
+    @FXML private TextArea message;
 
-    private Attemp currentAttemp;
+    private Attempt currentAttempt;
     private StringProperty timerText;
     private Timeline timeline;
+    private AudioClip applause;
 
     public Home() {
         timerText = new SimpleStringProperty();
         setTimerText(0);
+        applause = new AudioClip(getClass().getResource("/sounds/applause.mp3").toExternalForm());
+
     }
 
     public String getTimerText() {
@@ -43,26 +50,44 @@ public class Home {
         setTimerText(String.format("%02d:%02d", minutes, seconds));
     }
 
-    private void prepareAttemp(AttemptKind kind) {
-        currentAttemp = new Attemp(kind, "");
+    private void prepareAttempt(AttemptKind kind) {
+        reset();
+        currentAttempt = new Attempt(kind, "");
         timeline = new Timeline();
         timeline.setCycleCount(kind.getTotalSeconds());
-        // TODO: Creating multiple timelines. Need to fix!
         timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1), e -> {
-            currentAttemp.tick();
-            setTimerText(currentAttemp.getRemainingSeconds());
+            currentAttempt.tick();
+            setTimerText(currentAttempt.getRemainingSeconds());
         }));
-        clearAttemptStyles();
+        timeline.setOnFinished(e -> {
+            saveCurrentAttempt();
+            applause.play();
+            prepareAttempt(currentAttempt.getKind() == AttemptKind.FOCUS ? AttemptKind.BREAK : AttemptKind.FOCUS);
+        });
         addAttemptStyle(kind);
         title.setText(kind.getDisplayName());
-        setTimerText(currentAttemp.getRemainingSeconds());
+        setTimerText(currentAttempt.getRemainingSeconds());
+    }
+
+    private void saveCurrentAttempt() {
+        currentAttempt.setMessage(message.getText());
+        currentAttempt.save();
+    }
+
+    private void reset() {
+        clearAttemptStyles();
+        if (timeline != null && timeline.getStatus() == Animation.Status.RUNNING) {
+            timeline.stop();
+        }
     }
 
     public void playTimer() {
+        container.getStyleClass().add("playing");
         timeline.play();
     }
 
     public void pauseTimer() {
+        container.getStyleClass().remove("playing");
         timeline.pause();
     }
 
@@ -71,13 +96,25 @@ public class Home {
     }
 
     private void clearAttemptStyles() {
+        container.getStyleClass().remove("playing");
         for (AttemptKind kind : AttemptKind.values()) {
             container.getStyleClass().remove(kind.toString().toLowerCase());
         }
     }
 
     public void handleRestart(ActionEvent actionEvent) {
-        prepareAttemp(AttemptKind.FOCUS);
+        prepareAttempt(AttemptKind.FOCUS);
         playTimer();
+    }
+
+    public void handlePlay(ActionEvent actionEvent) {
+        if (currentAttempt == null)
+            handleRestart(actionEvent);
+        else
+            playTimer();
+    }
+
+    public void handlePause(ActionEvent actionEvent) {
+        pauseTimer();
     }
 }
