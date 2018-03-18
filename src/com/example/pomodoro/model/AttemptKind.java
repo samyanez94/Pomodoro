@@ -1,16 +1,22 @@
 package com.example.pomodoro.model;
 
 public enum AttemptKind {
-    FOCUS(25 * 60),
-    BREAK(5 * 60);
+    FOCUS(25 * 60, "Focus time"),
+    BREAK(5 * 60, "Break time");
 
     private int totalSeconds;
+    private String displayName;
 
-    AttemptKind(int totalSeconds) {
+    AttemptKind(int totalSeconds, String displayName) {
         this.totalSeconds = totalSeconds;
+        this.displayName = displayName;
     }
 
     public int getTotalSeconds() {
         return totalSeconds;
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 }
