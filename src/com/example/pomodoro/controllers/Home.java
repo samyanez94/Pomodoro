@@ -7,7 +7,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -29,30 +28,32 @@ public class Home {
         timerText = new SimpleStringProperty();
         setTimerText(0);
         applause = new AudioClip(getClass().getResource("/sounds/applause.mp3").toExternalForm());
-
-    }
-
-    public String getTimerText() {
-        return timerText.get();
-    }
-
-    public StringProperty timerTextProperty() {
-        return timerText;
-    }
-
-    public void setTimerText(String timerText) {
-        this.timerText.set(timerText);
-    }
-
-    public void setTimerText(int remainingSeconds) {
-        int minutes = remainingSeconds / 60;
-        int seconds = remainingSeconds % 60;
-        setTimerText(String.format("%02d:%02d", minutes, seconds));
     }
 
     private void prepareAttempt(AttemptKind kind) {
         reset();
         currentAttempt = new Attempt(kind, "");
+        setUpTimeline(kind);
+        addAttemptStyle(kind);
+        title.setText(kind.getDisplayName());
+        setTimerText(currentAttempt.getRemainingSeconds());
+    }
+
+    private void clearAttemptStyles() {
+        container.getStyleClass().remove("playing");
+        for (AttemptKind kind : AttemptKind.values()) {
+            container.getStyleClass().remove(kind.toString().toLowerCase());
+        }
+    }
+
+    private void reset() {
+        clearAttemptStyles();
+        if (timeline != null && timeline.getStatus() == Animation.Status.RUNNING) {
+            timeline.stop();
+        }
+    }
+
+    private void setUpTimeline(AttemptKind kind) {
         timeline = new Timeline();
         timeline.setCycleCount(kind.getTotalSeconds());
         timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1), e -> {
@@ -64,9 +65,28 @@ public class Home {
             applause.play();
             prepareAttempt(currentAttempt.getKind() == AttemptKind.FOCUS ? AttemptKind.BREAK : AttemptKind.FOCUS);
         });
-        addAttemptStyle(kind);
-        title.setText(kind.getDisplayName());
-        setTimerText(currentAttempt.getRemainingSeconds());
+    }
+
+    private void addAttemptStyle(AttemptKind kind) {
+        container.getStyleClass().add(kind.toString().toLowerCase());
+    }
+
+    public String getTimerText() {
+        return timerText.get();
+    }
+
+    public StringProperty timerTextProperty() {
+        return timerText;
+    }
+
+    private void setTimerText(String timerText) {
+        this.timerText.set(timerText);
+    }
+
+    private void setTimerText(int remainingSeconds) {
+        int minutes = remainingSeconds / 60;
+        int seconds = remainingSeconds % 60;
+        setTimerText(String.format("%02d:%02d", minutes, seconds));
     }
 
     private void saveCurrentAttempt() {
@@ -74,47 +94,29 @@ public class Home {
         currentAttempt.save();
     }
 
-    private void reset() {
-        clearAttemptStyles();
-        if (timeline != null && timeline.getStatus() == Animation.Status.RUNNING) {
-            timeline.stop();
-        }
-    }
-
-    public void playTimer() {
+    private void playTimer() {
         container.getStyleClass().add("playing");
         timeline.play();
     }
 
-    public void pauseTimer() {
+    private void pauseTimer() {
         container.getStyleClass().remove("playing");
         timeline.pause();
     }
 
-    private void addAttemptStyle(AttemptKind kind) {
-        container.getStyleClass().add(kind.toString().toLowerCase());
-    }
-
-    private void clearAttemptStyles() {
-        container.getStyleClass().remove("playing");
-        for (AttemptKind kind : AttemptKind.values()) {
-            container.getStyleClass().remove(kind.toString().toLowerCase());
-        }
-    }
-
-    public void handleRestart(ActionEvent actionEvent) {
-        prepareAttempt(AttemptKind.FOCUS);
-        playTimer();
-    }
-
-    public void handlePlay(ActionEvent actionEvent) {
+    public void handlePlay() {
         if (currentAttempt == null)
-            handleRestart(actionEvent);
+            handleRestart();
         else
             playTimer();
     }
 
-    public void handlePause(ActionEvent actionEvent) {
+    public void handlePause() {
         pauseTimer();
+    }
+
+    public void handleRestart() {
+        prepareAttempt(AttemptKind.FOCUS);
+        playTimer();
     }
 }
