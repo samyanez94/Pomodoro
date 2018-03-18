@@ -26,4 +26,8 @@ public class Attemp {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    public void tick() {
+        remainingSeconds--;
+    }
 }
