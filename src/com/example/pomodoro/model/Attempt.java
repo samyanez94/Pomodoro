@@ -1,9 +1,9 @@
 package com.example.pomodoro.model;
 
 public class Attempt {
+    private AttemptKind kind;
     private String message;
     private int remainingSeconds;
-    private AttemptKind kind;
 
     public Attempt(AttemptKind kind, String message) {
         this.kind = kind;
@@ -11,20 +11,20 @@ public class Attempt {
         remainingSeconds = kind.getTotalSeconds();
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public int getRemainingSeconds() {
-        return remainingSeconds;
-    }
-
     public AttemptKind getKind() {
         return kind;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public int getRemainingSeconds() {
+        return remainingSeconds;
     }
 
     public void tick() {
@@ -37,11 +37,9 @@ public class Attempt {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Attempt{");
-        sb.append("kind=").append(kind);
-        sb.append(", message='").append(message).append('\'');
-        sb.append(", remainingSeconds=").append(remainingSeconds);
-        sb.append('}');
-        return sb.toString();
+        return "Attempt {" + "kind = " + kind +
+                ", message = '" + message + '\'' +
+                ", remainingSeconds = " + remainingSeconds +
+                '}';
     }
 }
