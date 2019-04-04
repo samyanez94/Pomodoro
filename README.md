@@ -1,6 +1,6 @@
 # Pomodoro
 
-JavaFX is the most common way to make Graphical User Interfaces (or GUIs) in Java. It is robust and customizable, 
+JavaFX one the most common ways to make Graphical User Interfaces (or GUIs) in Java. It is robust and customizable, 
 and getting familiar with its APIs exposes many application design best practices. Following a course by Craig Denis
 from [Treehouse.com](https://teamtreehouse.com) on JavaFX, I decided to build a pomodoro timer. 
 
