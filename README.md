@@ -11,7 +11,6 @@ breaks. These intervals are named pomodoros, after the tomato-shaped kitchen tim
 ## Screenshots
 
 ![alt tag](https://i.imgur.com/Qn2Lc8K.jpg)
-App can be seen on the top right corner of the screen below the menu bar.
 
 ## Author
 
